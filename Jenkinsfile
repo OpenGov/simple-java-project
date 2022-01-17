@@ -13,7 +13,7 @@ pipeline {
               scannerHome = tool 'SonarScanner'
             }
             steps{
-                withSonarQubeEnv() {
+                withSonarQubeEnv('sonarqube-prod') {
                   sh "mvn clean install"
                   sh "${scannerHome}/bin/sonar-scanner -X"  
                 }     
