@@ -1,23 +1,35 @@
 pipeline {
     agent {
-        docker { image 'openjdk:11.0.9' }
+      label 'docker'
     }
     stages {
         stage('SCM') {
-            steps{
-                checkout scm
-            }
+          agent {
+              docker {
+                label 'docker'
+                image 'openjdk:11.0.9'
+              }
+          }   
+          steps {
+            checkout scm
+          }
         }
         stage('SonarQube Analysis') {
-            environment {
+          environment {
               scannerHome = tool 'SonarScanner'
+            }  
+          agent {
+            docker {
+              label 'docker'
+                image 'openjdk:11.0.9'
             }
-            steps{
-                withSonarQubeEnv('sonarqube-prod') {
-                  sh "mvn clean install"
-                  sh "${scannerHome}/bin/sonar-scanner -X"  
-                }     
-            }
+          } 
+          steps{
+            withSonarQubeEnv() {
+                sh "mvn clean install"
+                sh "${scannerHome}/bin/sonar-scanner -X"  
+            }     
+          }
        }
     }
 }
